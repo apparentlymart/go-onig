@@ -18,3 +18,7 @@ int goonig_regex_match(
     int str_len,
     OnigRegion *region,
     OnigOptionType option);
+
+void goonig_init_region(OnigRegion *reg);
+void goonig_free_region(OnigRegion *reg);
+int goonig_region_resize(OnigRegion *reg, int size);

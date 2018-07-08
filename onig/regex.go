@@ -22,14 +22,40 @@ func NewRegex(pattern string, options CompileOptions, syntax Syntax) (*Regex, er
 	return r, nil
 }
 
+// Match tests whether the receiver matches a prefix of the given string,
+// returning a description of the match if one is found. If no match is found
+// then the result is nil.
+func (r *Regex) Match(s string, opts MatchOptions) *Match {
+	m := new(Match)
+	matchInit(m)
+	matches := regexMatch(r, s, opts, m)
+	if !matches {
+		return nil
+	}
+	return m
+}
+
+// MatchBytes tests whether the receiver matches a prefix of the given byte
+// slice, returning a description of the match if one is found. If no match is
+// found then the result is nil.
+func (r *Regex) MatchBytes(b []byte, opts MatchOptions) *Match {
+	m := new(Match)
+	matchInit(m)
+	matches := regexMatchBytes(r, b, opts, m)
+	if !matches {
+		return nil
+	}
+	return m
+}
+
 // Matches tests whether the receiver matches a prefix of the given string,
 // returning true if a match is found.
 func (r *Regex) Matches(s string, opts MatchOptions) bool {
-	return regexMatch(r, s, opts)
+	return regexMatch(r, s, opts, nil)
 }
 
 // MatchesBytes tests whether the receiver matches a prefix of the given byte
 // slice, returning true if a match is found.
 func (r *Regex) MatchesBytes(b []byte, opts MatchOptions) bool {
-	return regexMatchBytes(r, b, opts)
+	return regexMatchBytes(r, b, opts, nil)
 }

@@ -5,6 +5,7 @@ package onig
 import "C"
 
 import (
+	"reflect"
 	"runtime"
 	"unsafe"
 )
@@ -19,7 +20,10 @@ import (
 
 type errorInfo [C.sizeof_OnigErrorInfo]byte
 
-const regexSizeof = C.sizeof_regex_t
+const (
+	regexSizeof  = C.sizeof_regex_t
+	regionSizeof = C.sizeof_OnigRegion
+)
 
 // For error_test.go only
 const errCodeEmptyCharClass = C.ONIGERR_EMPTY_CHAR_CLASS
@@ -86,32 +90,140 @@ func regexInit(r *Regex, pattern string, options CompileOptions, syntax Syntax) 
 	return nil
 }
 
-func regexMatch(r *Regex, s string, options MatchOptions) bool {
+func regexMatch(r *Regex, s string, options MatchOptions, m *Match) bool {
 	sC := C.CString(s)
 	result := C.goonig_regex_match(
 		r.cPtr(),
 		sC,
 		C.int(len(s)),
-		nil,
+		m.cPtr(),
 		options.cVal(),
 	)
 	return result >= 0
 }
 
-func regexMatchBytes(r *Regex, b []byte, options MatchOptions) bool {
+func regexMatchBytes(r *Regex, b []byte, options MatchOptions, m *Match) bool {
 	sC := (*C.char)(unsafe.Pointer(&b[0]))
 	result := C.goonig_regex_match(
 		r.cPtr(),
 		sC,
 		C.int(len(b)),
-		nil,
+		m.cPtr(),
 		options.cVal(),
 	)
 	return result >= 0
 }
 
+func matchInit(m *Match) {
+	C.goonig_init_region(m.cPtr())
+	runtime.SetFinalizer(m, func(m *Match) {
+		// Free any buffers associated with the match.
+		C.goonig_free_region(m.cPtr())
+	})
+}
+
+func matchInitFake(m *Match, spans []Span) error {
+	matchInit(m)
+	c := m.cPtr()
+	l := len(spans)
+	errCode := C.goonig_region_resize(c, C.int(l))
+	if errCode != 0 {
+		return onigError{
+			code: int(errCode),
+		}
+	}
+	begs := *(*[]C.int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(c.beg)), l, l,
+	}))
+	ends := *(*[]C.int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(c.end)), l, l,
+	}))
+	for i, span := range spans {
+		begs[i] = C.int(span.Start)
+		ends[i] = C.int(span.End)
+	}
+	return nil
+}
+
+func matchCaptureCount(m *Match) int {
+	c := m.cPtr()
+	return int(c.num_regs) - 1
+}
+
+func matchCapture(m *Match, idx int) Span {
+	max := matchCaptureCount(m)
+	if idx > max || idx < 0 {
+		panic("capture index out of range")
+	}
+
+	c := m.cPtr()
+	begPU := uintptr(unsafe.Pointer(c.beg))
+	endPU := uintptr(unsafe.Pointer(c.end))
+	begPU += uintptr(idx)
+	endPU += uintptr(idx)
+	begP := (*C.int)(unsafe.Pointer(begPU))
+	endP := (*C.int)(unsafe.Pointer(endPU))
+
+	return Span{
+		Start: int(*begP),
+		End:   int(*endP),
+	}
+}
+
+func matchEqual(a *Match, b *Match) bool {
+	if (a == nil) != (b == nil) {
+		return false
+	}
+	if a == nil {
+		return true
+	}
+
+	aC := a.cPtr()
+	bC := b.cPtr()
+	if aC.num_regs != bC.num_regs {
+		return false
+	}
+	num := int(aC.num_regs)
+
+	aBegs := *(*[]int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(aC.beg)), num, num,
+	}))
+	bBegs := *(*[]int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(bC.beg)), num, num,
+	}))
+	aEnds := *(*[]int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(aC.end)), num, num,
+	}))
+	bEnds := *(*[]int)(unsafe.Pointer(&reflect.SliceHeader{
+		uintptr(unsafe.Pointer(bC.end)), num, num,
+	}))
+
+	for i := range aBegs {
+		if aBegs[i] != bBegs[i] {
+			return false
+		}
+	}
+	for i := range aEnds {
+		if aEnds[i] != bEnds[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (r *Regex) cPtr() *C.regex_t {
+	if r == nil {
+		return nil
+	}
 	return (*C.regex_t)(unsafe.Pointer(&r.c[0]))
+}
+
+func (m *Match) cPtr() *C.OnigRegion {
+	if m == nil {
+		return nil
+	}
+	return (*C.OnigRegion)(unsafe.Pointer(&m.c[0]))
 }
 
 func (r *errorInfo) cPtr() *C.OnigErrorInfo {

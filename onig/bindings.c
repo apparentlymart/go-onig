@@ -37,3 +37,18 @@ int goonig_regex_match(
 {
     return onig_match(reg, str, str + str_len, str, region, option);
 }
+
+void goonig_init_region(OnigRegion *reg)
+{
+    onig_region_init(reg);
+}
+
+void goonig_free_region(OnigRegion *reg)
+{
+    onig_region_free(reg, 0);
+}
+
+int goonig_region_resize(OnigRegion *reg, int size)
+{
+    return onig_region_resize(reg, size);
+}
