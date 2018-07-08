@@ -98,6 +98,18 @@ func regexMatch(r *Regex, s string, options MatchOptions) bool {
 	return result >= 0
 }
 
+func regexMatchBytes(r *Regex, b []byte, options MatchOptions) bool {
+	sC := (*C.char)(unsafe.Pointer(&b[0]))
+	result := C.goonig_regex_match(
+		r.cPtr(),
+		sC,
+		C.int(len(b)),
+		nil,
+		options.cVal(),
+	)
+	return result >= 0
+}
+
 func (r *Regex) cPtr() *C.regex_t {
 	return (*C.regex_t)(unsafe.Pointer(&r.c[0]))
 }

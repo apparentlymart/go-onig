@@ -27,3 +27,9 @@ func NewRegex(pattern string, options CompileOptions, syntax Syntax) (*Regex, er
 func (r *Regex) Match(s string, opts MatchOptions) bool {
 	return regexMatch(r, s, opts)
 }
+
+// MatchBytes tests whether the receiver matches a prefix of the given byte
+// slice, returning true if a match is found.
+func (r *Regex) MatchBytes(b []byte, opts MatchOptions) bool {
+	return regexMatchBytes(r, b, opts)
+}

@@ -48,7 +48,15 @@ func TestRegexMatch(t *testing.T) {
 			got := r.Match(test.Str, NoMatchOpts)
 			if got != test.Want {
 				t.Errorf(
-					"wrong result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
+					"wrong Match result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
+					test.Pattern, test.Str, got, test.Want,
+				)
+			}
+
+			got = r.MatchBytes([]byte(test.Str), NoMatchOpts)
+			if got != test.Want {
+				t.Errorf(
+					"wrong MatchBytes result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
 					test.Pattern, test.Str, got, test.Want,
 				)
 			}
