@@ -22,14 +22,14 @@ func NewRegex(pattern string, options CompileOptions, syntax Syntax) (*Regex, er
 	return r, nil
 }
 
-// Match tests whether the receiver matches a prefix of the given string,
+// Matches tests whether the receiver matches a prefix of the given string,
 // returning true if a match is found.
-func (r *Regex) Match(s string, opts MatchOptions) bool {
+func (r *Regex) Matches(s string, opts MatchOptions) bool {
 	return regexMatch(r, s, opts)
 }
 
-// MatchBytes tests whether the receiver matches a prefix of the given byte
+// MatchesBytes tests whether the receiver matches a prefix of the given byte
 // slice, returning true if a match is found.
-func (r *Regex) MatchBytes(b []byte, opts MatchOptions) bool {
+func (r *Regex) MatchesBytes(b []byte, opts MatchOptions) bool {
 	return regexMatchBytes(r, b, opts)
 }

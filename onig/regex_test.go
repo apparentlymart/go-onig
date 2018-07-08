@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestRegexMatch(t *testing.T) {
+func TestRegexMatches(t *testing.T) {
 	tests := []struct {
 		Pattern string
 		Str     string
@@ -45,18 +45,18 @@ func TestRegexMatch(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			got := r.Match(test.Str, NoMatchOpts)
+			got := r.Matches(test.Str, NoMatchOpts)
 			if got != test.Want {
 				t.Errorf(
-					"wrong Match result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
+					"wrong Matches result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
 					test.Pattern, test.Str, got, test.Want,
 				)
 			}
 
-			got = r.MatchBytes([]byte(test.Str), NoMatchOpts)
+			got = r.MatchesBytes([]byte(test.Str), NoMatchOpts)
 			if got != test.Want {
 				t.Errorf(
-					"wrong MatchBytes result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
+					"wrong MatchesBytes result\npattern: %s\nstring:  %s\ngot:     %#v\nwant:    %#v",
 					test.Pattern, test.Str, got, test.Want,
 				)
 			}
