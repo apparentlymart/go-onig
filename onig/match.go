@@ -15,6 +15,27 @@ func (m *Match) Bounds() Span {
 	return m.Capture(0)
 }
 
+// SubstrAround splits the given string into three substrings, giving the
+// portion before, inside and after the bounds of this match.
+//
+// This is just a convenience wrapper around three slice operations, which
+// may be useful for walking through a string looking for matches.
+func (m *Match) SubstrAround(s string) (before, inside, after string) {
+	span := m.Bounds()
+	return s[:span.Start], s[span.Start:span.End], s[span.End:]
+}
+
+// SliceAround splits the given slice into three sub-slices, giving the
+// portion before, inside and after the bounds of this match. The new slices
+// all refer to portions of the same backing array as the given slice.
+//
+// This is just a convenience wrapper around three slice operations, which
+// may be useful for walking through a byte array looking for matches.
+func (m *Match) SliceAround(b []byte) (before, inside, after []byte) {
+	span := m.Bounds()
+	return b[:span.Start], b[span.Start:span.End], b[span.End:]
+}
+
 // Capture returns the number of captures.
 func (m *Match) CaptureCount() int {
 	return matchCaptureCount(m)
