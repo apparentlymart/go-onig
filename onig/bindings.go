@@ -113,6 +113,40 @@ func regexMatchBytes(r *Regex, b []byte, options MatchOptions, m *Match) bool {
 	return result >= 0
 }
 
+func regexSearch(r *Regex, s string, options MatchOptions, rev bool, m *Match) bool {
+	sC := C.CString(s)
+	revC := C.int(0)
+	if rev {
+		revC = C.int(1)
+	}
+	result := C.goonig_regex_search(
+		r.cPtr(),
+		sC,
+		C.int(len(s)),
+		revC,
+		m.cPtr(),
+		options.cVal(),
+	)
+	return result >= 0
+}
+
+func regexSearchBytes(r *Regex, b []byte, options MatchOptions, rev bool, m *Match) bool {
+	sC := (*C.char)(unsafe.Pointer(&b[0]))
+	revC := C.int(0)
+	if rev {
+		revC = C.int(1)
+	}
+	result := C.goonig_regex_search(
+		r.cPtr(),
+		sC,
+		C.int(len(b)),
+		revC,
+		m.cPtr(),
+		options.cVal(),
+	)
+	return result >= 0
+}
+
 func matchInit(m *Match) {
 	C.goonig_init_region(m.cPtr())
 	runtime.SetFinalizer(m, func(m *Match) {

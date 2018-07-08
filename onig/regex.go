@@ -48,6 +48,32 @@ func (r *Regex) MatchBytes(b []byte, opts MatchOptions) *Match {
 	return m
 }
 
+// Search tests whether the receiver matches a substring of the given string,
+// returning a description of the first match found. If no match is found then
+// the result is nil.
+func (r *Regex) Search(s string, opts MatchOptions) *Match {
+	m := new(Match)
+	matchInit(m)
+	matches := regexSearch(r, s, opts, false, m)
+	if !matches {
+		return nil
+	}
+	return m
+}
+
+// SearchBytes tests whether the receiver matches a substring of the given byte
+// slice, returning a description of the first match found. If no match is
+// found then the result is nil.
+func (r *Regex) SearchBytes(b []byte, opts MatchOptions) *Match {
+	m := new(Match)
+	matchInit(m)
+	matches := regexSearchBytes(r, b, opts, false, m)
+	if !matches {
+		return nil
+	}
+	return m
+}
+
 // Matches tests whether the receiver matches a prefix of the given string,
 // returning true if a match is found.
 func (r *Regex) Matches(s string, opts MatchOptions) bool {

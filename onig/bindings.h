@@ -18,6 +18,13 @@ int goonig_regex_match(
     int str_len,
     OnigRegion *region,
     OnigOptionType option);
+int goonig_regex_search(
+    regex_t *reg,
+    const char *str,
+    int str_len,
+    int rev, // bool
+    OnigRegion *region,
+    OnigOptionType option);
 
 void goonig_init_region(OnigRegion *reg);
 void goonig_free_region(OnigRegion *reg);

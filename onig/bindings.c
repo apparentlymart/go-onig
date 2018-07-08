@@ -38,6 +38,21 @@ int goonig_regex_match(
     return onig_match(reg, str, str + str_len, str, region, option);
 }
 
+int goonig_regex_search(
+    regex_t *reg,
+    const char *str,
+    int str_len,
+    int rev,
+    OnigRegion *region,
+    OnigOptionType option)
+{
+    if (rev) {
+        return onig_search(reg, str, str, str + str_len, str, region, option);
+    }
+    return onig_search(
+        reg, str, str + str_len, str, str + str_len, region, option);
+}
+
 void goonig_init_region(OnigRegion *reg)
 {
     onig_region_init(reg);
