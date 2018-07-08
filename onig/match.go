@@ -18,9 +18,15 @@ func (m *Match) Bounds() Span {
 // SubstrAround splits the given string into three substrings, giving the
 // portion before, inside and after the bounds of this match.
 //
+// If m is nil, before and inside are both empty and after is identical to
+// the given string.
+//
 // This is just a convenience wrapper around three slice operations, which
 // may be useful for walking through a string looking for matches.
 func (m *Match) SubstrAround(s string) (before, inside, after string) {
+	if m == nil {
+		return "", "", s
+	}
 	span := m.Bounds()
 	return s[:span.Start], s[span.Start:span.End], s[span.End:]
 }
@@ -29,9 +35,15 @@ func (m *Match) SubstrAround(s string) (before, inside, after string) {
 // portion before, inside and after the bounds of this match. The new slices
 // all refer to portions of the same backing array as the given slice.
 //
+// If m is nil, before and inside are both nil and after is identical to
+// the given slice.
+//
 // This is just a convenience wrapper around three slice operations, which
 // may be useful for walking through a byte array looking for matches.
 func (m *Match) SliceAround(b []byte) (before, inside, after []byte) {
+	if m == nil {
+		return nil, nil, b
+	}
 	span := m.Bounds()
 	return b[:span.Start], b[span.Start:span.End], b[span.End:]
 }

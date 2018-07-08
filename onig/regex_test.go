@@ -139,6 +139,63 @@ func TestRegexSearch(t *testing.T) {
 	}
 }
 
+func TestRegexSearchAround(t *testing.T) {
+	tests := []struct {
+		Pattern    string
+		Str        string
+		WantBefore string
+		WantInside string
+		WantAfter  string
+	}{
+		{
+			`hello`,
+			`hello world`,
+			``, `hello`, ` world`,
+		},
+		{
+			`hel*o`,
+			`helllllo world`,
+			``, `helllllo`, ` world`,
+		},
+		{
+			`he(l*)o`,
+			`helllllo world`,
+			``, `helllllo`, ` world`,
+		},
+		{
+			`he(l*)o`,
+			`goodbye world`,
+			``, ``, `goodbye world`,
+		},
+		{
+			`hello`,
+			`why hello, world`,
+			`why `, `hello`, `, world`,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%q in %q", test.Pattern, test.Str), func(t *testing.T) {
+			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxRuby)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			{
+				gotBefore, gotInside, gotAfter := r.SearchAround(test.Str, NoMatchOpts)
+				if gotBefore != test.WantBefore || gotInside != test.WantInside || gotAfter != test.WantAfter {
+					t.Errorf(
+						"wrong SearchAround result\npattern: %s\nstring:  %s\ngot:     %q %q %q\nwant:    %q %q %q",
+						test.Pattern, test.Str,
+						gotBefore, gotInside, gotAfter,
+						test.WantBefore, test.WantInside, test.WantAfter,
+					)
+				}
+			}
+		})
+	}
+}
+
 func TestRegexMatches(t *testing.T) {
 	tests := []struct {
 		Pattern string

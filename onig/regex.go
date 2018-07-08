@@ -74,6 +74,26 @@ func (r *Regex) SearchBytes(b []byte, opts MatchOptions) *Match {
 	return m
 }
 
+// SearchAround is equivalent to Search followed by slicing the string
+// around the first match, if any.
+//
+// If there is no match, both the "before" and "inside" strings are empty and
+// the "after" string exactly matches the input.
+func (r *Regex) SearchAround(s string, opts MatchOptions) (before, inside, after string) {
+	match := r.Search(s, opts)
+	return match.SubstrAround(s)
+}
+
+// SearchAroundBytes is equivalent to SearchBytes followed by slicing the
+// given slice around the first match, if any.
+//
+// If there is no match, both the "before" and "inside" slices are nil and
+// the "after" slice exactly matches the input.
+func (r *Regex) SearchAroundBytes(b []byte, opts MatchOptions) (before, inside, after []byte) {
+	match := r.SearchBytes(b, opts)
+	return match.SliceAround(b)
+}
+
 // Matches tests whether the receiver matches a prefix of the given string,
 // returning true if a match is found.
 func (r *Regex) Matches(s string, opts MatchOptions) bool {
