@@ -1,6 +1,7 @@
 #include <bindings.h>
 
-int goonig_error_code_to_str(UChar *err_buf, int err_code, OnigErrorInfo *err_info)
+int goonig_error_code_to_str(
+    UChar *err_buf, int err_code, OnigErrorInfo *err_info)
 {
     return onig_error_code_to_str(err_buf, err_code, err_info);
 }

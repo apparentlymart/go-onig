@@ -3,7 +3,8 @@
 // This file contains some helper wrappers around oniguruma APIs. Any global
 // symbols defined here must be namespaced as "goonig".
 
-int goonig_error_code_to_str(UChar *err_buf, int err_code, OnigErrorInfo *err_info);
+int goonig_error_code_to_str(
+    UChar *err_buf, int err_code, OnigErrorInfo *err_info);
 int goonig_init_regex(
     regex_t *reg,
     const char *pattern,
