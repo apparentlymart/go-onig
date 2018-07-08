@@ -42,7 +42,7 @@ func TestRegexMatch(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%q in %q", test.Pattern, test.Str), func(t *testing.T) {
-			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxDefault)
+			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxRuby)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -100,7 +100,7 @@ func TestRegexMatches(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%q in %q", test.Pattern, test.Str), func(t *testing.T) {
-			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxDefault)
+			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxRuby)
 			if err != nil {
 				t.Fatal(err)
 			}

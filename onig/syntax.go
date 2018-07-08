@@ -4,7 +4,7 @@ package onig
 type Syntax uintptr
 
 var (
-	SyntaxDefault       Syntax
+	SyntaxOniguruma     Syntax
 	SyntaxAsIs          Syntax
 	SyntaxPosixBasic    Syntax
 	SyntaxPosixExtended Syntax

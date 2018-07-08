@@ -45,7 +45,6 @@ const (
 func init() {
 	C.onig_init()
 
-	SyntaxDefault = Syntax(unsafe.Pointer(C.OnigDefaultSyntax))
 	SyntaxAsIs = Syntax(unsafe.Pointer(&C.OnigSyntaxASIS))
 	SyntaxPosixBasic = Syntax(unsafe.Pointer(&C.OnigSyntaxPosixBasic))
 	SyntaxPosixExtended = Syntax(unsafe.Pointer(&C.OnigSyntaxPosixExtended))
