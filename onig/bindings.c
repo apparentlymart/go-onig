@@ -59,6 +59,40 @@ int goonig_regex_capture_count(regex_t *reg)
     return onig_number_of_captures(reg);
 }
 
+typedef struct {
+    goonig_name_table_entry *next;
+    int count;
+} goonig_regex_name_table_state;
+
+int goonig_regex_name_table_cb(
+    const UChar *start,
+    const UChar *end,
+    int num,
+    int *groups,
+    regex_t *reg,
+    void *stateP)
+{
+    goonig_regex_name_table_state *state =
+        (goonig_regex_name_table_state *)(stateP);
+
+    for (int i = 0; i < num; i++) {
+        state->count++;
+        state->next->start = (UChar *)start;
+        state->next->len = end - start;
+        state->next->idx = groups[i];
+        state->next++;
+    }
+}
+
+int goonig_regex_name_table(regex_t *reg, goonig_name_table_entry *next)
+{
+    goonig_regex_name_table_state state;
+    state.next = next;
+    state.count = 0;
+    onig_foreach_name(reg, goonig_regex_name_table_cb, &state);
+    return state.count;
+}
+
 void goonig_init_region(OnigRegion *reg)
 {
     onig_region_init(reg);

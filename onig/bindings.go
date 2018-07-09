@@ -42,6 +42,11 @@ const (
 	optNotEOL           MatchOptions   = C.ONIG_OPTION_NOTEOL
 )
 
+type nameTableEntry struct {
+	Name string
+	Num  int
+}
+
 func init() {
 	C.onig_init()
 
@@ -150,6 +155,31 @@ func regexSearchBytes(r *Regex, b []byte, options MatchOptions, rev bool, m *Mat
 func regexCaptureCount(r *Regex) int {
 	result := C.goonig_regex_capture_count(r.cPtr())
 	return int(result)
+}
+
+func regexNameTable(r *Regex) []nameTableEntry {
+	l := regexCaptureCount(r)
+	if l == 0 {
+		return nil
+	}
+	table := make([]C.goonig_name_table_entry, l)
+	realLen := C.goonig_regex_name_table(r.cPtr(), &table[0])
+	if realLen == 0 {
+		return nil
+	}
+	ret := make([]nameTableEntry, realLen)
+	for i, raw := range table {
+		nameLen := int(raw.len)
+		nameBytes := *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+			uintptr(unsafe.Pointer(raw.start)), nameLen, nameLen,
+		}))
+
+		ret[i] = nameTableEntry{
+			Name: string(nameBytes),
+			Num:  int(raw.idx),
+		}
+	}
+	return ret
 }
 
 func matchInit(m *Match) {

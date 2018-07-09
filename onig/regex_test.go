@@ -2,6 +2,7 @@ package onig
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -292,6 +293,72 @@ func TestRegexCaptureCount(t *testing.T) {
 
 			got := r.CaptureCount()
 			if got != test.Want {
+				t.Errorf(
+					"wrong CaptureCount result\npattern: %s\ngot:     %#v\nwant:    %#v",
+					test.Pattern, got, test.Want,
+				)
+			}
+		})
+	}
+}
+
+func TestRegexNamedCaptures(t *testing.T) {
+	tests := []struct {
+		Pattern string
+		Want    map[string][]int
+	}{
+		{
+			`hello`,
+			nil,
+		},
+		{
+			`hel*o`,
+			nil,
+		},
+		{
+			`he(l*)o`,
+			nil,
+		},
+		{
+			`he((l)*)o`,
+			nil,
+		},
+		{
+			`he(?<els>(l)*)o`,
+			map[string][]int{
+				"els": {1},
+			},
+		},
+		{
+			`he((?<el>l)*)o`,
+			map[string][]int{
+				"el": {1},
+			},
+		},
+		{
+			`he(?<els>(?<el>l)*)o`,
+			map[string][]int{
+				"els": {1},
+				"el":  {2},
+			},
+		},
+		{
+			`he(?<foo>(?<foo>l)*)o`,
+			map[string][]int{
+				"foo": {1, 2},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Pattern, func(t *testing.T) {
+			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxRuby)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got := r.NamedCaptures()
+			if !reflect.DeepEqual(got, test.Want) {
 				t.Errorf(
 					"wrong CaptureCount result\npattern: %s\ngot:     %#v\nwant:    %#v",
 					test.Pattern, got, test.Want,

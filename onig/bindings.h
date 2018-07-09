@@ -3,6 +3,12 @@
 // This file contains some helper wrappers around oniguruma APIs. Any global
 // symbols defined here must be namespaced as "goonig".
 
+typedef struct {
+    UChar *start;
+    int len;
+    int idx;
+} goonig_name_table_entry;
+
 int goonig_error_code_to_str(
     UChar *err_buf, int err_code, OnigErrorInfo *err_info);
 int goonig_init_regex(
@@ -27,6 +33,7 @@ int goonig_regex_search(
     OnigRegion *region,
     OnigOptionType option);
 int goonig_regex_capture_count(regex_t *reg);
+int goonig_regex_name_table(regex_t *reg, goonig_name_table_entry *next);
 
 void goonig_init_region(OnigRegion *reg);
 void goonig_free_region(OnigRegion *reg);

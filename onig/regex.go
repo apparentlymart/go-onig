@@ -112,3 +112,44 @@ func (r *Regex) MatchesBytes(b []byte, opts MatchOptions) bool {
 func (r *Regex) CaptureCount() int {
 	return regexCaptureCount(r)
 }
+
+// NamedCaptures returns a map from capture names in the regex to the numbers
+// of those captures as could be passed to method Capture on any match returned
+// from this regex.
+//
+// A particular name can appear multiple times, so this function returns all
+// of them. For a helper that returns only the first number for each, see
+// NamedCapturesSingle.
+func (r *Regex) NamedCaptures() map[string][]int {
+	entries := regexNameTable(r)
+	if len(entries) == 0 {
+		return nil
+	}
+	ret := make(map[string][]int, len(entries))
+	for _, entry := range entries {
+		ret[entry.Name] = append(ret[entry.Name], entry.Num)
+	}
+	return ret
+}
+
+// NamedCapturesFirst returns a map from capture names in the regex to the
+// numbers of those captures as could be passed to method Capture on any match
+// returned from this regex.
+//
+// A particular name can appear multiple times, so this function discards
+// any subsequent re-definitions of a name to return only a single number for
+// each.
+func (r *Regex) NamedCapturesFirst() map[string]int {
+	entries := regexNameTable(r)
+	if len(entries) == 0 {
+		return nil
+	}
+	ret := make(map[string]int, len(entries))
+	for _, entry := range entries {
+		if _, exists := ret[entry.Name]; exists {
+			continue
+		}
+		ret[entry.Name] = entry.Num
+	}
+	return ret
+}
