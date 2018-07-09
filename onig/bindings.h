@@ -26,6 +26,7 @@ int goonig_regex_search(
     int rev, // bool
     OnigRegion *region,
     OnigOptionType option);
+int goonig_regex_capture_count(regex_t *reg);
 
 void goonig_init_region(OnigRegion *reg);
 void goonig_free_region(OnigRegion *reg);

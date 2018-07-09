@@ -105,3 +105,10 @@ func (r *Regex) Matches(s string, opts MatchOptions) bool {
 func (r *Regex) MatchesBytes(b []byte, opts MatchOptions) bool {
 	return regexMatchBytes(r, b, opts, nil)
 }
+
+// CaptureCount returns the number of capture sequences present in the
+// receiver. This is the highest number that can be passed to method Capture
+// on any match returned from this regex.
+func (r *Regex) CaptureCount() int {
+	return regexCaptureCount(r)
+}

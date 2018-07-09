@@ -147,6 +147,11 @@ func regexSearchBytes(r *Regex, b []byte, options MatchOptions, rev bool, m *Mat
 	return result >= 0
 }
 
+func regexCaptureCount(r *Regex) int {
+	result := C.goonig_regex_capture_count(r.cPtr())
+	return int(result)
+}
+
 func matchInit(m *Match) {
 	C.goonig_init_region(m.cPtr())
 	runtime.SetFinalizer(m, func(m *Match) {

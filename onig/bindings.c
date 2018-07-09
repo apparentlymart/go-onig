@@ -54,6 +54,11 @@ int goonig_regex_search(
         reg, str, str + str_len, str, str + str_len, region, option);
 }
 
+int goonig_regex_capture_count(regex_t *reg)
+{
+    return onig_number_of_captures(reg);
+}
+
 void goonig_init_region(OnigRegion *reg)
 {
     onig_region_init(reg);

@@ -259,3 +259,44 @@ func TestRegexMatches(t *testing.T) {
 		})
 	}
 }
+
+func TestRegexCaptureCount(t *testing.T) {
+	tests := []struct {
+		Pattern string
+		Want    int
+	}{
+		{
+			`hello`,
+			0,
+		},
+		{
+			`hel*o`,
+			0,
+		},
+		{
+			`he(l*)o`,
+			1,
+		},
+		{
+			`he((l)*)o`,
+			2,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Pattern, func(t *testing.T) {
+			r, err := NewRegex(test.Pattern, NoCompileOpts, SyntaxRuby)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got := r.CaptureCount()
+			if got != test.Want {
+				t.Errorf(
+					"wrong CaptureCount result\npattern: %s\ngot:     %#v\nwant:    %#v",
+					test.Pattern, got, test.Want,
+				)
+			}
+		})
+	}
+}
